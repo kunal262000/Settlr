@@ -32,15 +32,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </div>
             <span className="font-semibold text-navy">Settlr</span>
           </Link>
-          <nav className="flex items-center gap-6 text-sm">
+<nav className="flex items-center gap-6 text-sm">
+            <Link href="/"
+              className="text-ink-muted hover:text-ink flex items-center gap-1.5">
+              <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
+                <path d="M3 12l2-5h2l2-2 2 2h2l2 2h2l2-2 2 2h2l2 5z"/>
+              </svg>
+              Home
+            </Link>
             <Link href="/dashboard" className="text-ink-muted hover:text-ink">Dashboard</Link>
             <Link href="/dashboard/new" className="text-ink-muted hover:text-ink">New Reconciliation</Link>
             <Link href="/dashboard/billing" className="text-ink-muted hover:text-ink">Billing</Link>
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="rounded-md bg-navy px-3 py-1.5 font-medium text-white hover:opacity-90"
-              >
+            {isAdminEmail(user.email ?? '') && (
+              <Link href="/admin" className="rounded-md bg-navy px-3 py-1.5 font-medium text-white hover:opacity-90">
                 Admin Panel
               </Link>
             )}

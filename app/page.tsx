@@ -1,7 +1,13 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui';
+import { supabaseServerComponent } from '@/lib/supabase-server';
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = supabaseServerComponent();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <div className="min-h-screen">
       <Nav />
@@ -10,7 +16,7 @@ export default function LandingPage() {
       <HowItWorks />
       <WhatItCatches />
       <FinalCTA />
-      <Footer />
+      <Footer isLoggedIn={!!user} />
     </div>
   );
 }
@@ -213,7 +219,7 @@ function FinalCTA() {
   );
 }
 
-function Footer() {
+function Footer({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <footer className="border-t border-border">
       <div className="mx-auto max-w-6xl px-6 py-12 grid sm:grid-cols-3 lg:grid-cols-5 gap-8">
@@ -238,15 +244,18 @@ function Footer() {
             { label: 'Pricing', href: '/pricing' },
             { label: 'How it works', href: '/#how-it-works' },
             { label: 'Blog', href: '/blog' },
+            { label: 'Support', href: '/support' },
           ]}
         />
-        <FooterColumn
-          title="Account"
-          links={[
-            { label: 'Log in', href: '/login' },
-            { label: 'Sign up', href: '/signup' },
-          ]}
-        />
+        {isLoggedIn ? null : (
+          <FooterColumn
+            title="Account"
+            links={[
+              { label: 'Log in', href: '/login' },
+              { label: 'Sign up', href: '/signup' },
+            ]}
+          />
+        )}
         <FooterColumn
           title="Legal"
           links={[
@@ -269,7 +278,7 @@ function Footer() {
         </div>
       </div>
     </footer>
-  );
+  )
 }
 
 function FooterColumn({ title, links }: { title: string; links: { label: string; href: string }[] }) {
