@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { randomUUID } from 'node:crypto';
-import { supabaseRouteHandler } from '@/lib/supabase-server';
+import { supabaseRouteHandler, supabaseServiceRole } from '@/lib/supabase-server';
 import { createCashfreeOrder } from '@/lib/cashfree';
 import { getPlan, PLANS, type PlanId } from '@/lib/pricing';
 import { enforceRateLimit } from '@/lib/rate-limit';
@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
       returnUrl: `${origin}/dashboard/billing`,
     });
 
-    const { error: insertError } = await supabase.from('payments').insert({
+    const supa = supabaseServiceRole();
+    const { error: insertError } = await supa.from('payments').insert({
       user_id: user.id,
       plan_id: planId,
       cashfree_order_id: order.order_id,
