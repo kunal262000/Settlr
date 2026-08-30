@@ -46,10 +46,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ status: orderStatus.order_status });
     }
 
-    // Activate immediately rather than waiting for the webhook, using the
-    // service-role client since regular users have no write policy on
-    // these tables. The webhook will arrive separately and upsert the same
-    // row again — harmless.
+    // Activate immediately after independently confirming order status with
+    // Cashfree's API, using the service-role client since regular users have
+    // no write policy on these tables.
     const serviceClient = supabaseServiceRole();
     await serviceClient
       .from('payments')

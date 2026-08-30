@@ -41,12 +41,10 @@ defined in `lib/pricing.ts`. Paid plans are billed through Cashfree.
 1. Create a Cashfree account and get your API keys from Developers → API
    Keys. Use the Sandbox keys while testing.
 2. Add `CASHFREE_APP_ID` and `CASHFREE_SECRET_KEY` to `.env.local`.
-3. In Cashfree Dashboard → Developers → Webhooks, add a webhook pointing to
-   `https://yourdomain.com/api/billing/webhook`, subscribed to the
-   `PAYMENT_SUCCESS_WEBHOOK` event. This webhook is the authoritative path
-   that activates a subscription — the redirect back from checkout
-   (`/api/billing/verify`) is only a same-request UX convenience so the
-   billing page can update immediately without waiting on the webhook.
+3. Payment activation is verified server-side: after checkout the app calls
+   Cashfree's order-status API directly (via `/api/billing/verify`) and
+   activates the subscription only on a confirmed PAID response — no webhook
+   configuration is needed.
 4. Set `CASHFREE_ENV=sandbox` (default) while testing; switch to
    `CASHFREE_ENV=production` and `NEXT_PUBLIC_CASHFREE_ENV=production` to
    go live. The two must match, since one controls which Cashfree API the

@@ -76,22 +76,3 @@ export async function getCashfreeOrderStatus(orderId: string): Promise<{ order_s
   }
   return data;
 }
-
-/**
- * Verifies a Cashfree webhook using the timestamp + raw body HMAC-SHA256
- * scheme described at https://docs.cashfree.com/docs/webhooks — signature
- * is base64(HMAC-SHA256(secret, timestamp + rawBody)).
- */
-export async function verifyCashfreeWebhookSignature(rawBody: string, timestamp: string, signature: string): Promise<boolean> {
-  const secret = process.env.CASHFREE_WEBHOOK_SECRET || process.env.CASHFREE_SECRET_KEY;
-  if (!secret) throw new Error('CASHFREE_WEBHOOK_SECRET / CASHFREE_SECRET_KEY is not set.');
-
-  const crypto = await import('node:crypto');
-  const expected = crypto.createHmac('sha256', secret).update(timestamp + rawBody).digest('base64');
-
-  // Constant-time comparison to avoid timing attacks.
-  const expectedBuf = Buffer.from(expected);
-  const signatureBuf = Buffer.from(signature);
-  if (expectedBuf.length !== signatureBuf.length) return false;
-  return crypto.timingSafeEqual(expectedBuf, signatureBuf);
-}

@@ -376,6 +376,7 @@ export function detectSellerColumns(columns: string[]): DetectedColumn[] {
     'sku',
     'product_name',
     'gross_amount',
+    'net_amount', // registers often carry the expected payout after fees
     'status',
   ]);
 }

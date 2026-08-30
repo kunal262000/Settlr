@@ -61,6 +61,7 @@ for (let i = 1; i <= 37; i++) {
   orders.push({
     orderNo, date, p, isReturn,
     commission, shipping, returnCharge, tcs, net,
+    baseNet: net, // register's expected payout before any settlement-side perturbation
     settlementStatus: isReturn ? 'RTO' : (i % 7 === 0 ? 'Return' : 'Delivered'),
   });
 }
@@ -103,6 +104,9 @@ XLSX.utils.book_append_sheet(wb, ws, 'Payment File');
 writeFileSync(join(outDir, 'meesho-settlement-sample.xlsx'), XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }));
 
 // ── Seller's own sales register (CSV) ──
+// Includes an "Expected Settlement Amount" column — the net payout the
+// seller expects per order after marketplace fees. With it, fee-deducted
+// orders match correctly and only genuine discrepancies get flagged.
 const registerRows = [];
 for (const o of orders) {
   registerRows.push({
@@ -111,6 +115,7 @@ for (const o of orders) {
     'SKU': o.p.sku,
     'Product Name': o.p.name,
     'Sale Amount': o.p.price,
+    'Expected Settlement Amount': o.baseNet,
     'Order Status': o.isReturn ? 'Returned' : 'Delivered',
   });
 }
