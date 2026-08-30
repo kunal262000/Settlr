@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { Button, Card } from '@/components/ui';
 import { PLANS, formatPlanPrice } from '@/lib/pricing';
+import { supabaseServerComponent } from '@/lib/supabase-server';
+import SignOutButton from '@/app/dashboard/sign-out-button';
 
 export const metadata = {
   title: 'Pricing — Settlr',
@@ -8,7 +10,14 @@ export const metadata = {
     'Simple, affordable pricing for Settlr — reconcile Amazon, Flipkart, and Meesho settlements without breaking the bank.',
 };
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const supabase = supabaseServerComponent();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isLoggedIn = !!user;
+
   return (
     <div className="min-h-screen">
       <header className="border-b border-border bg-surface">
@@ -22,9 +31,20 @@ export default function PricingPage() {
             </div>
             <span className="font-semibold text-navy">Settlr</span>
           </Link>
-          <Link href="/signup">
-            <Button className="!py-2 !px-4 text-sm">Get started</Button>
-          </Link>
+          {isLoggedIn ? (
+            <nav className="flex items-center gap-6 text-sm">
+              <Link href="/" className="text-ink-muted hover:text-ink">Home</Link>
+              <Link href="/dashboard" className="text-ink-muted hover:text-ink">Dashboard</Link>
+              <Link href="/dashboard/new" className="text-ink-muted hover:text-ink">New Reconciliation</Link>
+              <Link href="/dashboard/billing" className="text-ink-muted hover:text-ink">Billing</Link>
+              <span className="text-ink-muted hidden sm:block">{user?.email}</span>
+              <SignOutButton />
+            </nav>
+          ) : (
+            <Link href="/signup">
+              <Button className="!py-2 !px-4 text-sm">Get started</Button>
+            </Link>
+          )}
         </div>
       </header>
 

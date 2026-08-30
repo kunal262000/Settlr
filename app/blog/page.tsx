@@ -1,14 +1,22 @@
 import Link from 'next/link';
 import { Button, Card } from '@/components/ui';
 import { BLOG_POSTS } from '@/lib/blog-data';
+import { supabaseServerComponent } from '@/lib/supabase-server';
+import SignOutButton from '@/app/dashboard/sign-out-button';
 
 export const metadata = {
   title: 'Blog — Settlr',
   description:
-    'Guides on Amazon, Flipkart, and Meesho settlement reconciliation, GST and TCS/TDS compliance, and marketplace fee tracking for Indian e-commerce sellers.',
+    'Guides on Amazon, Flipkart, and Meesho settlement reconciliation, GST and TCS/TDS compliance, and marketplace fees tracking for Indian e-commerce sellers.',
 };
 
-export default function BlogIndexPage() {
+export default async function BlogIndexPage() {
+  const supabase = supabaseServerComponent();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isLoggedIn = !!user;
   const sorted = [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date));
 
   return (
@@ -24,9 +32,20 @@ export default function BlogIndexPage() {
             </div>
             <span className="font-semibold text-navy">Settlr</span>
           </Link>
-          <Link href="/signup">
-            <Button className="!py-2 !px-4 text-sm">Get started</Button>
-          </Link>
+          {isLoggedIn ? (
+            <nav className="flex items-center gap-6 text-sm">
+              <Link href="/" className="text-ink-muted hover:text-ink">Home</Link>
+              <Link href="/dashboard" className="text-ink-muted hover:text-ink">Dashboard</Link>
+              <Link href="/dashboard/new" className="text-ink-muted hover:text-ink">New Reconciliation</Link>
+              <Link href="/dashboard/billing" className="text-ink-muted hover:text-ink">Billing</Link>
+              <span className="text-ink-muted hidden sm:block">{user?.email}</span>
+              <SignOutButton />
+            </nav>
+          ) : (
+            <Link href="/signup">
+              <Button className="!py-2 !px-4 text-sm">Get started</Button>
+            </Link>
+          )}
         </div>
       </header>
 

@@ -10,18 +10,18 @@ export default async function LandingPage() {
 
   return (
     <div className="min-h-screen">
-      <Nav />
-      <Hero />
+      <Nav isLoggedIn={!!user} userEmail={user?.email} />
+      <Hero isLoggedIn={!!user} />
       <TrustStrip />
       <HowItWorks />
       <WhatItCatches />
-      <FinalCTA />
+      <FinalCTA isLoggedIn={!!user} />
       <Footer isLoggedIn={!!user} />
     </div>
   );
 }
 
-function Nav() {
+function Nav({ isLoggedIn, userEmail }: { isLoggedIn: boolean; userEmail?: string }) {
   return (
     <header className="border-b border-border bg-surface/80 backdrop-blur sticky top-0 z-40">
       <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
@@ -37,26 +37,43 @@ function Nav() {
             <span className="block text-[10px] text-ink-muted">Your settlements, settled.</span>
           </div>
         </div>
-        <nav className="hidden sm:flex items-center gap-8 text-sm text-ink-muted">
-          <a href="#how-it-works" className="hover:text-ink">How it works</a>
-          <a href="#what-it-catches" className="hover:text-ink">What it catches</a>
-          <Link href="/pricing" className="hover:text-ink">Pricing</Link>
-          <Link href="/blog" className="hover:text-ink">Blog</Link>
-        </nav>
+        {isLoggedIn ? (
+          <nav className="flex items-center gap-6 text-sm">
+            <Link href="/" className="text-ink-muted hover:text-ink">Home</Link>
+            <Link href="/dashboard" className="text-ink-muted hover:text-ink">Dashboard</Link>
+            <Link href="/dashboard/new" className="text-ink-muted hover:text-ink">New Reconciliation</Link>
+            <Link href="/dashboard/billing" className="text-ink-muted hover:text-ink">Billing</Link>
+            <span className="text-ink-muted hidden sm:block">{userEmail}</span>
+            <SignOutButton />
+          </nav>
+        ) : (
+          <nav className="hidden sm:flex items-center gap-8 text-sm text-ink-muted">
+            <a href="#how-it-works" className="hover:text-ink">How it works</a>
+            <a href="#what-it-catches" className="hover:text-ink">What it catches</a>
+            <Link href="/pricing" className="hover:text-ink">Pricing</Link>
+            <Link href="/blog" className="hover:text-ink">Blog</Link>
+          </nav>
+        )}
         <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm text-ink-muted hover:text-ink hidden sm:block">
-            Log in
-          </Link>
-          <Link href="/signup">
-            <Button className="!py-2 !px-4 text-sm">Get started</Button>
-          </Link>
+          {isLoggedIn ? null : (
+            <>
+              <Link href="/login" className="text-sm text-ink-muted hover:text-ink hidden sm:block">
+                Log in
+              </Link>
+              <Link href="/signup">
+                <Button className="!py-2 !px-4 text-sm">Get started</Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
   );
 }
 
-function Hero() {
+import SignOutButton from './dashboard/sign-out-button';
+
+function Hero({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <section className="mx-auto max-w-6xl px-6 pt-16 pb-20 grid lg:grid-cols-2 gap-14 items-center">
       <div>
@@ -72,7 +89,7 @@ function Hero() {
           and deductions that need your attention.
         </p>
         <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/signup">
+          <Link href={isLoggedIn ? '/dashboard/new' : '/signup'}>
             <Button className="text-base">Reconcile My Settlement</Button>
           </Link>
           <a href="#how-it-works">
@@ -205,13 +222,13 @@ function WhatItCatches() {
   );
 }
 
-function FinalCTA() {
+function FinalCTA({ isLoggedIn }: { isLoggedIn: boolean }) {
   return (
     <section className="mx-auto max-w-6xl px-6 py-24 text-center">
       <h2 className="text-3xl font-semibold text-navy">Reconcile your first settlement in minutes</h2>
       <p className="mt-4 text-ink-muted">Free to try. No card required.</p>
       <div className="mt-8">
-        <Link href="/signup">
+        <Link href={isLoggedIn ? '/dashboard/new' : '/signup'}>
           <Button className="text-base">Reconcile My Settlement</Button>
         </Link>
       </div>
