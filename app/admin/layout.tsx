@@ -1,10 +1,12 @@
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { supabaseServerComponent } from '@/lib/supabase-server';
+import { isAdminEmail } from '@/lib/admin';
 
 /**
  * Admin gate. Any signed-in user whose email is not on the ADMIN_EMAILS
- * allowlist gets bounced to the homepage — /admin effectively does not
- * exist for them. There is no link to it anywhere in the public UI.
+ * allowlist gets a hard 404 — /admin effectively does not exist for them.
+ * There is no link to it anywhere in the UI except the dashboard header
+ * button, which is server-rendered only for allowlisted emails.
  */
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = supabaseServerComponent();
@@ -14,12 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   if (!user) redirect('/login');
 
-  const allowlist = (process.env.ADMIN_EMAILS ?? '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-
-  if (!allowlist.includes((user.email ?? '').toLowerCase())) redirect('/');
+  if (!isAdminEmail(user.email ?? '')) notFound();
 
   return <>{children}</>;
 }

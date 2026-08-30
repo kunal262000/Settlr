@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { supabaseServerComponent } from '@/lib/supabase-server';
+import { isAdminEmail } from '@/lib/admin';
 import SignOutButton from './sign-out-button';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -14,12 +15,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
   }
 
   // Show the Admin Panel link only when the signed-in email is on the
-  // ADMIN_EMAILS allowlist — same check the /admin layout enforces.
-  const adminEmails = (process.env.ADMIN_EMAILS ?? '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  const isAdmin = adminEmails.includes((user.email ?? '').toLowerCase());
+  // ADMIN_EMAILS allowlist — the exact same shared check the /admin layout
+  // enforces, so the button and the route can never disagree.
+  const isAdmin = isAdminEmail(user.email ?? '');
 
   return (
     <div className="min-h-screen bg-bg">
