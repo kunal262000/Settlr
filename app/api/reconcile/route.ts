@@ -128,6 +128,7 @@ export async function POST(req: NextRequest) {
       seller_record: r.seller_record ? stripRaw(r.seller_record) : null,
       marketplace_records: r.marketplace_records.map(stripRaw),
       expected_amount: r.expected_amount ?? null,
+      transaction_date: r.transaction_date ?? null,
       marketplace_amount: r.marketplace_amount ?? null,
       difference: r.difference ?? null,
       reason: r.reason,

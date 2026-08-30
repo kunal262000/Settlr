@@ -49,6 +49,7 @@ create table if not exists reconciliation_records (
   marketplace_records jsonb,  -- normalized marketplace-side transaction(s), array
 
   expected_amount numeric(14,2),
+  transaction_date text,
   marketplace_amount numeric(14,2),
   difference numeric(14,2),
 
