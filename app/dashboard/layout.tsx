@@ -13,6 +13,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     redirect('/login');
   }
 
+  // Show the Admin Panel link only when the signed-in email is on the
+  // ADMIN_EMAILS allowlist — same check the /admin layout enforces.
+  const adminEmails = (process.env.ADMIN_EMAILS ?? '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  const isAdmin = adminEmails.includes((user.email ?? '').toLowerCase());
+
   return (
     <div className="min-h-screen bg-bg">
       <header className="border-b border-border bg-surface">
@@ -30,6 +38,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
             <Link href="/dashboard" className="text-ink-muted hover:text-ink">Dashboard</Link>
             <Link href="/dashboard/new" className="text-ink-muted hover:text-ink">New Reconciliation</Link>
             <Link href="/dashboard/billing" className="text-ink-muted hover:text-ink">Billing</Link>
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className="rounded-md bg-navy px-3 py-1.5 font-medium text-white hover:opacity-90"
+              >
+                Admin Panel
+              </Link>
+            )}
             <span className="text-ink-muted hidden sm:block">{user.email}</span>
             <SignOutButton />
           </nav>
