@@ -360,7 +360,7 @@ export function normalizeRows(
           amountType === 'return' ||
           amountDesc.includes('refund')
         ) {
-          net_amount = amountVal < 0 ? 0 : amountVal;
+          net_amount = amountVal !== undefined ? (amountVal < 0 ? 0 : amountVal) : undefined;
         } else {
           adjustment_amount = amountVal;
         }
