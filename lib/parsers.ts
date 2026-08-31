@@ -164,6 +164,7 @@ const MARKETPLACE_ALIASES: Record<Marketplace, Partial<Record<string, string[]>>
     net_amount: ['amount', 'total-amount', 'payment amount', 'net proceeds'],
     transaction_type: ['transaction-type', 'amount-type'],
     status: ['amount-description'],
+    amount_type: ['amount-type', 'amount type'],
   },
   flipkart: {
     order_id: ['order id', 'order item id', 'order_id'],
@@ -191,19 +192,16 @@ function normalizeHeader(header: string): string {
 function scoreMatch(normalizedHeader: string, alias: string): number {
   if (normalizedHeader === alias) return 3; // exact
 
-  // Word-based containment: only count a match when the shorter phrase
-  // contributes at least 2 overlapping words. This prevents a generic
-  // single-word column (e.g. a bare "amount" column, common in Amazon's
-  // settlement export) from falsely matching every alias that happens to
-  // contain that word as one component of a longer phrase (e.g. "gross
-  // amount", "commission amount"). A single generic word should only ever
-  // win via an exact match against a field with a matching short alias
-  // (like net_amount's dedicated "amount" alias), never a fuzzy contains.
   const headerWords = normalizedHeader.split(' ').filter(Boolean);
   const aliasWords = alias.split(' ').filter(Boolean);
   const [shorter, longer] = headerWords.length <= aliasWords.length ? [headerWords, aliasWords] : [aliasWords, headerWords];
 
-  if (shorter.length >= 2 && shorter.every((w) => longer.includes(w))) return 2; // contains
+  // Substring containment: if the shorter phrase appears as a contiguous
+  // substring of the longer one (after whitespace normalization), count it.
+  // This handles column names like "Return Shipping Charge (If Applicable)"
+  // matching the alias "return shipping charge".
+  if (shorter.length >= 2 && normalizedHeader.includes(alias)) return 2;
+  if (shorter.length >= 2 && shorter.every((w) => longer.includes(w))) return 1; // word-based contains
 
   return 0;
 }
@@ -240,13 +238,13 @@ export function detectColumns(
       }
     }
 
-    results.push({
-      internalField: field,
-      label: fieldLabel(field),
-      detectedColumn: best?.column ?? null,
-      confidence: best ? (best.score >= 3 ? 'high' : 'medium') : 'none',
-      required: requiredFields.includes(field),
-    });
+      results.push({
+        internalField: field,
+        label: fieldLabel(field),
+        detectedColumn: best?.column ?? null,
+        confidence: best ? (best.score >= 3 ? 'high' : best.score >= 2 ? 'medium' : 'low') : 'none',
+        required: requiredFields.includes(field),
+      });
   }
 
   return results;
@@ -305,7 +303,75 @@ export function normalizeRows(
       const get = (field: string) => (mapping[field] ? row[mapping[field]] : undefined);
       const orderIdRaw = get('order_id');
       if (orderIdRaw === undefined || orderIdRaw === null || String(orderIdRaw).trim() === '') {
-        return null; // rows without an order id can't be reconciled — skip, don't invent one
+        return null;
+      }
+
+      const amountTypeRaw = get('transaction_type') ? row[mapping['transaction_type']] : undefined;
+      const amountType = typeof amountTypeRaw === 'string' ? amountTypeRaw.toLowerCase() : '';
+      const amountTypeColRaw = mapping['amount_type'] ? row[mapping['amount_type']] : undefined;
+      const amountTypeCol = typeof amountTypeColRaw === 'string' ? amountTypeColRaw.toLowerCase() : '';
+      const amountDescRaw = mapping['status'] ? row[mapping['status']] : undefined;
+      const amountDesc = typeof amountDescRaw === 'string' ? amountDescRaw.toLowerCase() : '';
+
+      let gross_amount: number | undefined;
+      let commission_amount: number | undefined;
+      let shipping_amount: number | undefined;
+      let tcs_amount: number | undefined;
+      let refund_amount: number | undefined;
+      let adjustment_amount: number | undefined;
+      let net_amount: number | undefined;
+
+      const amountVal = toNumber(get('net_amount'));
+
+      if (sourcePlatform === 'amazon' && mapping['net_amount']) {
+        const rowAmountType = amountTypeCol || amountType;
+        if (
+          rowAmountType === 'net settlement' ||
+          amountDesc === 'net settlement'
+        ) {
+          net_amount = amountVal;
+        } else if (
+          rowAmountType === 'itemprice' ||
+          rowAmountType === 'order'
+        ) {
+          gross_amount = amountVal;
+        } else if (
+          rowAmountType === 'marketplacefacilitationfee' ||
+          rowAmountType === 'marketplacefee' ||
+          amountDesc.includes('facilitation fee') ||
+          amountDesc.includes('referral fee') ||
+          amountDesc.includes('fba fee')
+        ) {
+          commission_amount = amountVal !== undefined ? Math.abs(amountVal) : undefined;
+        } else if (
+          rowAmountType === 'shippingfee' ||
+          rowAmountType === 'shipping charge'
+        ) {
+          shipping_amount = amountVal !== undefined ? Math.abs(amountVal) : undefined;
+        } else if (
+          rowAmountType === 'tax' ||
+          amountDesc.includes('tcs')
+        ) {
+          tcs_amount = amountVal !== undefined ? Math.abs(amountVal) : undefined;
+        } else if (
+          rowAmountType === 'refund' ||
+          rowAmountType === 'return' ||
+          amountType === 'refund' ||
+          amountType === 'return' ||
+          amountDesc.includes('refund')
+        ) {
+          net_amount = amountVal < 0 ? 0 : amountVal;
+        } else {
+          adjustment_amount = amountVal;
+        }
+      } else {
+        gross_amount = toNumber(get('gross_amount'));
+        commission_amount = toNumber(get('commission_amount'));
+        shipping_amount = toNumber(get('shipping_amount'));
+        tcs_amount = toNumber(get('tcs_amount'));
+        refund_amount = toNumber(get('refund_amount'));
+        adjustment_amount = toNumber(get('adjustment_amount'));
+        net_amount = amountVal;
       }
 
       return {
@@ -315,14 +381,14 @@ export function normalizeRows(
         transaction_date: toDateString(get('transaction_date')),
         sku: get('sku') ? String(get('sku')) : undefined,
         product_name: get('product_name') ? String(get('product_name')) : undefined,
-        gross_amount: toNumber(get('gross_amount')),
-        commission_amount: toNumber(get('commission_amount')),
-        shipping_amount: toNumber(get('shipping_amount')),
+        gross_amount,
+        commission_amount,
+        shipping_amount,
         return_amount: toNumber(get('return_amount')),
-        refund_amount: toNumber(get('refund_amount')),
-        tcs_amount: toNumber(get('tcs_amount')),
-        adjustment_amount: toNumber(get('adjustment_amount')),
-        net_amount: toNumber(get('net_amount')),
+        refund_amount,
+        tcs_amount,
+        adjustment_amount,
+        net_amount,
         transaction_type: get('transaction_type') ? String(get('transaction_type')) : undefined,
         status: get('status') ? String(get('status')) : undefined,
         _raw: row,
@@ -353,6 +419,7 @@ const SETTLEMENT_OPTIONAL_FIELDS = [
   'net_amount',
   'transaction_type',
   'status',
+  'amount_type',
 ];
 
 /**

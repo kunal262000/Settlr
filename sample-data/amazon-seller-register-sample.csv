@@ -1,0 +1,25 @@
+Order ID,Order Date,SKU,Product Name,Sale Amount,Expected Settlement Amount,Order Status
+AMZ1001,03/07/2026,WMN-KRT-YLW-XL,Womens Rayon Kurti - Yellow XL,549,454.61,Delivered
+AMZ1002,05/07/2026,FTW-SLPR-BLU-9,Mens Casual Slippers Blue Size 9,349,264.53,Delivered
+AMZ1003,07/07/2026,ACC-WTCH-BLK,Analog Wrist Watch - Black Dial,399,294.86,Returned
+AMZ1004,09/07/2026,HOM-BDSHT-DBL,Double Bedsheet with 2 Pillow Covers,649,548.29,Delivered
+AMZ1005,11/07/2026,SAR-BNJ-RED,Banarasi Silk Saree - Red,1199,1070.72,Delivered
+AMZ1006,13/07/2026,SAR-BNJ-RED,Banarasi Silk Saree - Red,1199,1067.15,Delivered
+AMZ1007,15/07/2026,FTW-SLPR-BLU-9,Mens Casual Slippers Blue Size 9,349,264.35,Delivered
+AMZ1008,17/07/2026,HOM-BDSHT-DBL,Double Bedsheet with 2 Pillow Covers,649,550.68,Delivered
+AMZ1009,19/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,348.4,Delivered
+AMZ1010,21/07/2026,FTW-SLPR-BLU-9,Mens Casual Slippers Blue Size 9,349,262.26,Delivered
+AMZ1010,21/07/2026,FTW-SLPR-BLU-9,Mens Casual Slippers Blue Size 9,349,262.26,Delivered
+AMZ1011,23/07/2026,ACC-WTCH-BLK,Analog Wrist Watch - Black Dial,399,315.09,Delivered
+AMZ1012,25/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,337.35,Delivered
+AMZ1013,27/07/2026,KRT-WT-MENS-L,"Cotton Kurta Set - White, Men L",749,638.32,Delivered
+AMZ1014,29/07/2026,FTW-SLPR-BLU-9,Mens Casual Slippers Blue Size 9,349,248.01,Returned
+AMZ1015,02/07/2026,ACC-WTCH-BLK,Analog Wrist Watch - Black Dial,399,320.13,Delivered
+AMZ1016,03/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,340.23,Delivered
+AMZ1017,05/07/2026,KRT-WT-MENS-L,"Cotton Kurta Set - White, Men L",749,645.77,Delivered
+AMZ1018,07/07/2026,WMN-KRT-YLW-XL,Womens Rayon Kurti - Yellow XL,549,450.88,Delivered
+AMZ1019,09/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,342.22,Delivered
+AMZ1020,11/07/2026,KRT-WT-MENS-L,"Cotton Kurta Set - White, Men L",749,641.15,Delivered
+AMZ1021,13/07/2026,WMN-KRT-YLW-XL,Womens Rayon Kurti - Yellow XL,549,452.64,Delivered
+AMZ1022,15/07/2026,HOM-BDSHT-DBL,Double Bedsheet with 2 Pillow Covers,649,543.31,Delivered
+AMZ1023,17/07/2026,ACC-WTCH-BLK,Analog Wrist Watch - Black Dial,399,318.41,Delivered

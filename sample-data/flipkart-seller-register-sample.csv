@@ -1,0 +1,25 @@
+Order ID,Order Date,SKU,Product Name,Sale Amount,Expected Settlement Amount,Order Status
+FK1001,03/07/2026,SAR-BNJ-RED,Banarasi Silk Saree - Red,1199,1058.76,Delivered
+FK1002,05/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,349.71,Delivered
+FK1003,07/07/2026,MEN-TRS-DNM-32,Mens Denim Jeans Slim Fit 32,899,763.36,Returned
+FK1004,09/07/2026,KRT-WT-MENS-L,"Cotton Kurta Set - White, Men L",749,647.5,Delivered
+FK1005,11/07/2026,FTW-SLPR-BLU-9,Mens Casual Slippers Blue Size 9,349,271.4,Delivered
+FK1006,13/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,340.76,Delivered
+FK1007,15/07/2026,HOM-BDSHT-DBL,Double Bedsheet with 2 Pillow Covers,649,547.34,Delivered
+FK1008,17/07/2026,ACC-WTCH-BLK,Analog Wrist Watch - Black Dial,399,312.74,Delivered
+FK1009,19/07/2026,WMN-KRT-YLW-XL,Womens Rayon Kurti - Yellow XL,549,461.08,Delivered
+FK1010,21/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,348.77,Delivered
+FK1010,21/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,348.77,Delivered
+FK1011,23/07/2026,FTW-SLPR-BLU-9,Mens Casual Slippers Blue Size 9,349,260.37,Delivered
+FK1012,25/07/2026,SAR-BNJ-RED,Banarasi Silk Saree - Red,1199,1059.25,Delivered
+FK1013,27/07/2026,SAR-BNJ-RED,Banarasi Silk Saree - Red,1199,1065.13,Delivered
+FK1014,29/07/2026,KRT-WT-MENS-L,"Cotton Kurta Set - White, Men L",749,622.81,Returned
+FK1015,02/07/2026,KRT-WT-MENS-L,"Cotton Kurta Set - White, Men L",749,647.61,Delivered
+FK1016,03/07/2026,KDS-GRL-FRK-5Y,"Kids Girls Party Frock, Age 5Y",429,341.83,Delivered
+FK1017,05/07/2026,FTW-SLPR-BLU-9,Mens Casual Slippers Blue Size 9,349,268.65,Delivered
+FK1018,07/07/2026,MEN-TRS-DNM-32,Mens Denim Jeans Slim Fit 32,899,785.04,Delivered
+FK1019,09/07/2026,HOM-BDSHT-DBL,Double Bedsheet with 2 Pillow Covers,649,549.88,Delivered
+FK1020,11/07/2026,KRT-WT-MENS-L,"Cotton Kurta Set - White, Men L",749,638.45,Delivered
+FK1021,13/07/2026,MEN-TRS-DNM-32,Mens Denim Jeans Slim Fit 32,899,777.92,Delivered
+FK1022,15/07/2026,SAR-BNJ-RED,Banarasi Silk Saree - Red,1199,1061.23,Delivered
+FK1023,17/07/2026,WMN-KRT-YLW-XL,Womens Rayon Kurti - Yellow XL,549,450.95,Delivered

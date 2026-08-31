@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui';
+import { AnimatedAmount } from '@/components/animated-amount';
 import { supabaseServerComponent } from '@/lib/supabase-server';
 
 export default async function LandingPage() {
@@ -116,10 +117,14 @@ function ReconciliationFlowVisual() {
 
   return (
     <div className="relative">
-      <div className="rounded-2xl border border-border bg-surface shadow-card p-6">
+      <div className="rounded-2xl border border-border bg-surface shadow-card p-6 overflow-hidden">
         <div className="flex flex-col">
           {steps.map((step, i) => (
-            <div key={step.label}>
+            <div
+              key={step.label}
+              className="animate-step opacity-0"
+              style={{ animationDelay: `${i * 200}ms` }}
+            >
               <div className="flex items-center gap-4 py-3">
                 <div className="h-9 w-9 shrink-0 rounded-lg bg-navy/5 border border-navy/10 flex items-center justify-center text-navy text-xs font-semibold">
                   {i + 1}
@@ -136,10 +141,15 @@ function ReconciliationFlowVisual() {
           ))}
         </div>
 
-        <div className="mt-4 rounded-xl bg-warning-bg border border-warning/20 p-4">
-          <p className="text-xs text-warning font-medium uppercase tracking-wide">Product example</p>
-          <p className="mt-1 text-2xl font-semibold text-navy tabular-nums">₹34,430</p>
-          <p className="text-sm text-ink-muted">Requiring Review</p>
+        <div className="mt-4 rounded-xl bg-warning-bg border border-warning/20 p-4 relative overflow-hidden animate-box">
+          <div className="absolute inset-0 bg-gradient-to-r from-warning/5 via-transparent to-warning/5 animate-shimmer" />
+          <div className="relative">
+            <p className="text-xs text-warning font-medium uppercase tracking-wide">Product example</p>
+            <p className="mt-1 text-2xl font-semibold text-navy">
+              <AnimatedAmount target={34430} />
+            </p>
+            <p className="text-sm text-ink-muted animate-fade-delay">Requiring Review</p>
+          </div>
         </div>
       </div>
     </div>

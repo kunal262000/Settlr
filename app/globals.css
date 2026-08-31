@@ -18,3 +18,87 @@
     font-variant-numeric: tabular-nums;
   }
 }
+
+@keyframes step-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-border {
+  0%, 100% {
+    border-color: rgba(234, 88, 12, 0.2);
+    box-shadow: 0 0 0 0 rgba(234, 88, 12, 0);
+  }
+  50% {
+    border-color: rgba(234, 88, 12, 0.4);
+    box-shadow: 0 0 12px 2px rgba(234, 88, 12, 0.1);
+  }
+}
+
+@keyframes number-count {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-step {
+  animation: step-enter 0.5s ease-out forwards;
+}
+
+.animate-count {
+  animation: number-count 0.4s ease-out 0.8s forwards;
+  opacity: 0;
+}
+
+.animate-number {
+  display: inline-block;
+  animation: number-count 0.4s ease-out 0.8s forwards;
+  opacity: 0;
+}
+
+.animate-fade {
+  animation: fade-in 0.4s ease-out 1s forwards;
+  opacity: 0;
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s ease-in-out infinite;
+}
+
+.animate-fade-delay {
+  animation: fade-in 0.4s ease-out 1.2s forwards;
+  opacity: 0;
+}
+
+.animate-box {
+  animation: pulse-border 2s ease-in-out 0.8s infinite;
+}

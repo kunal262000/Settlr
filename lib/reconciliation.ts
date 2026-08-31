@@ -117,7 +117,7 @@ function classify(params: {
     (r) =>
       (r.return_amount ?? 0) > 0 ||
       (r.transaction_type ?? '').toLowerCase().includes('return') ||
-      (r.status ?? '').toLowerCase().includes('return') ||
+      (r.transaction_type ?? '').toLowerCase().includes('refund') ||
       (r.status ?? '').toLowerCase().includes('rto')
   );
 
@@ -140,6 +140,22 @@ function classify(params: {
   }
 
   const difference = round2(expected - netAmount);
+  const hasReturnAmount = marketplaceRecords.some(
+    (r) => (r.return_amount ?? 0) > 0
+  );
+  const hasRefundTransactionType = marketplaceRecords.some(
+    (r) => (r.transaction_type ?? '').toLowerCase() === 'refund'
+  );
+
+  if (hasReturnAmount || hasRefundTransactionType || returnLike) {
+    return {
+      status: 'RETURN_DISCREPANCY',
+      reason: `A return or RTO was recorded for this order and the settlement differs from your sales record by ₹${Math.abs(difference).toLocaleString('en-IN')}. Difference requiring review.`,
+      expected,
+      marketplaceAmount: netAmount,
+      difference,
+    };
+  }
 
   if (Math.abs(difference) <= AMOUNT_TOLERANCE) {
     return {
@@ -151,22 +167,6 @@ function classify(params: {
     };
   }
 
-  if (returnLike) {
-    return {
-      status: 'RETURN_DISCREPANCY',
-      reason: `A return or RTO was recorded for this order and the settlement differs from your sales record by ₹${Math.abs(difference).toLocaleString('en-IN')}. Difference requiring review.`,
-      expected,
-      marketplaceAmount: netAmount,
-      difference,
-    };
-  }
-
-  // PARTIAL_SETTLEMENT asserts something specific and unproven if inferred
-  // merely from "only one row exists for this order" — for wide-format
-  // marketplaces (Flipkart, Meesho) a single row IS the complete, final
-  // settlement, not evidence that more is coming. Only treat a shortfall
-  // as "partial" when the source data itself signals a pending/processing
-  // state; otherwise it's a difference requiring review like any other.
   const pendingLike = marketplaceRecords.some((r) => {
     const status = (r.status ?? '').toLowerCase();
     const type = (r.transaction_type ?? '').toLowerCase();
