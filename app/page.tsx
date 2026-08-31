@@ -109,50 +109,117 @@ function Hero({ isLoggedIn }: { isLoggedIn: boolean }) {
 
 function ReconciliationFlowVisual() {
   const steps = [
-    { label: 'UPLOAD', detail: 'Settlement + Sales Reports' },
-    { label: 'MATCH', detail: 'Orders and Transactions' },
-    { label: 'ANALYZE', detail: 'Amounts and Deductions' },
-    { label: 'DISCOVER', detail: 'What Needs Attention' },
+    { label: 'UPLOAD', detail: 'Settlement + Sales Reports', icon: UploadIcon },
+    { label: 'MATCH', detail: 'Orders and Transactions', icon: MatchIcon },
+    { label: 'ANALYZE', detail: 'Amounts and Deductions', icon: AnalyzeIcon },
+    { label: 'DISCOVER', detail: 'What Needs Attention', icon: DiscoverIcon },
   ];
 
   return (
     <div className="relative">
-      <div className="rounded-2xl border border-border bg-surface shadow-card p-6 overflow-hidden">
+      <div className="rounded-2xl border border-border bg-surface shadow-card p-6 overflow-hidden animate-card-float">
         <div className="flex flex-col">
-          {steps.map((step, i) => (
-            <div
-              key={step.label}
-              className="animate-step opacity-0"
-              style={{ animationDelay: `${i * 200}ms` }}
-            >
-              <div className="flex items-center gap-4 py-3">
-                <div className="h-9 w-9 shrink-0 rounded-lg bg-navy/5 border border-navy/10 flex items-center justify-center text-navy text-xs font-semibold">
-                  {i + 1}
+          {steps.map((step, i) => {
+            const Icon = step.icon;
+            return (
+              <div
+                key={step.label}
+                className="animate-step opacity-0"
+                style={{ animationDelay: `${i * 250}ms` }}
+              >
+                <div className="flex items-center gap-4 py-3">
+                  <div className="relative">
+                    <div className="h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br from-navy to-navy/80 flex items-center justify-center text-white shadow-lg animate-icon-pop" style={{ animationDelay: `${i * 250 + 100}ms` }}>
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <div className="absolute -inset-1 rounded-xl bg-navy/20 animate-ping-slow" style={{ animationDelay: `${i * 250 + 500}ms` }} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-navy tracking-widest animate-text-slide">{step.label}</p>
+                    <p className="text-sm text-ink-muted animate-text-slide" style={{ animationDelay: `${i * 250 + 150}ms` }}>{step.detail}</p>
+                  </div>
+                  <div className="h-6 w-6 rounded-full bg-teal/10 flex items-center justify-center animate-check-pop opacity-0" style={{ animationDelay: `${i * 250 + 400}ms` }}>
+                    <svg className="h-3 w-3 text-teal" viewBox="0 0 12 12" fill="none">
+                      <path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-check-draw" />
+                    </svg>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-semibold text-navy tracking-wide">{step.label}</p>
-                  <p className="text-sm text-ink-muted">{step.detail}</p>
-                </div>
+                {i < steps.length - 1 && (
+                  <div className="ml-[1.25rem] h-6 relative">
+                    <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-border via-teal/30 to-border animate-line-grow" />
+                  </div>
+                )}
               </div>
-              {i < steps.length - 1 && (
-                <div className="ml-[1.1rem] h-5 w-px bg-border" aria-hidden />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="mt-4 rounded-xl bg-warning-bg border border-warning/20 p-4 relative overflow-hidden animate-box">
-          <div className="absolute inset-0 bg-gradient-to-r from-warning/5 via-transparent to-warning/5 animate-shimmer" />
+        <div className="mt-5 rounded-2xl bg-gradient-to-br from-warning-bg to-amber-50/50 border-2 border-warning/30 p-5 relative overflow-hidden animate-box-bounce">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(234,88,12,0.08),transparent_60%)] animate-pulse-glow" />
+          <div className="absolute -top-12 -right-12 h-24 w-24 rounded-full bg-warning/10 blur-2xl animate-float-slow" />
           <div className="relative">
-            <p className="text-xs text-warning font-medium uppercase tracking-wide">Product example</p>
-            <p className="mt-1 text-2xl font-semibold text-navy">
-              <AnimatedAmount target={34430} />
-            </p>
-            <p className="text-sm text-ink-muted animate-fade-delay">Requiring Review</p>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1 text-xs text-warning font-semibold uppercase tracking-wider animate-badge-pulse">
+                <svg className="h-3 w-3 animate-alert-shake" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 1.5l6.928 12H1.072L8 1.5zM7.25 6.75v2.5h1.5v-2.5h-1.5zm0 3.25v.5h1.5v-.5h-1.5z"/>
+                </svg>
+                Product example
+              </span>
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-bold text-navy tabular-nums animate-amount-bounce">
+                <AnimatedAmount target={34430} />
+              </span>
+              <span className="text-lg text-navy/60">INR</span>
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 text-xs text-warning/80 animate-fade-in-up" style={{ animationDelay: '1.3s' }}>
+                <span className="h-1.5 w-1.5 rounded-full bg-warning animate-pulse" />
+                Requires attention
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function UploadIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="17 8 12 3 7 8" />
+      <line x1="12" y1="3" x2="12" y2="15" />
+    </svg>
+  );
+}
+
+function MatchIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 3h5v5M8 3H3v5M3 16v5h5M21 16v5h-5M9 12l2 2 4-4" />
+    </svg>
+  );
+}
+
+function AnalyzeIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10" />
+      <line x1="12" y1="20" x2="12" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="14" />
+      <line x1="3" y1="20" x2="21" y2="20" />
+    </svg>
+  );
+}
+
+function DiscoverIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8" />
+      <path d="M21 21l-4.35-4.35M11 8v6M8 11h6" />
+    </svg>
   );
 }
 
