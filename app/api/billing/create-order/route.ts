@@ -35,7 +35,8 @@ export async function POST(req: NextRequest) {
   }
 
   const orderId = `sm_${planId}_${user.id.slice(0, 8)}_${randomUUID().slice(0, 8)}`;
-  const origin = req.nextUrl.origin;
+  const configuredAppUrl = (process.env.NEXT_PUBLIC_APP_URL ?? process.env.APP_URL ?? '').trim().replace(/\/$/, '');
+  const appUrl = configuredAppUrl || req.nextUrl.origin;
 
   try {
     const order = await createCashfreeOrder({
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
       amountINR: plan.priceINR,
       customerId: user.id,
       customerEmail: user.email ?? 'seller@settlr.app',
-      returnUrl: `${origin}/dashboard/billing`,
+      returnUrl: `${appUrl}/dashboard/billing`,
     });
 
     const supa = supabaseServiceRole();
