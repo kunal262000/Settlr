@@ -75,6 +75,24 @@ describe('parseFileBuffer: XLSX', () => {
     }
   });
 
+  it('keeps long numeric-looking order IDs in plain text instead of scientific notation', async () => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet([
+      { 'Order ID': 40071234567890, Amount: 500 },
+      { 'Order ID': 123456789012345, Amount: 750 },
+    ]);
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
+
+    const result = await parseFileBuffer('test.xlsx', buffer);
+    expect(isParseError(result)).toBe(false);
+    if (!isParseError(result)) {
+      expect(String(result.rows[0]['Order ID'])).toBe('40071234567890');
+      expect(String(result.rows[1]['Order ID'])).toBe('123456789012345');
+      expect(result.warnings?.some((w) => /scientific notation|keep them as plain text|precision/i.test(w))).toBe(true);
+    }
+  });
+
   it('errors gracefully on a corrupted/non-spreadsheet buffer', async () => {
     const result = await parseFileBuffer('test.xlsx', Buffer.from('this is not a real xlsx file'));
     expect(isParseError(result)).toBe(true);

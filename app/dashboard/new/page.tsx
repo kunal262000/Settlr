@@ -13,6 +13,7 @@ interface UploadResult {
   rows: Record<string, unknown>[];
   detected: DetectedColumn[];
   suggestedMapping: ColumnMapping;
+  warnings?: string[];
 }
 
 type StepId = 'marketplace' | 'upload' | 'mapping' | 'running';
@@ -287,14 +288,26 @@ function FileUploadCard({
           {loading ? 'Reading file…' : 'Click to choose a file'}
         </button>
       ) : (
-        <div className="mt-4 flex items-center justify-between rounded-xl bg-bg border border-border p-4">
-          <div>
-            <p className="text-sm font-medium text-ink">{result.fileName}</p>
-            <p className="text-xs text-ink-muted mt-0.5">{result.rowCount.toLocaleString('en-IN')} rows detected</p>
+        <div className="mt-4 space-y-3">
+          <div className="flex items-center justify-between rounded-xl bg-bg border border-border p-4">
+            <div>
+              <p className="text-sm font-medium text-ink">{result.fileName}</p>
+              <p className="text-xs text-ink-muted mt-0.5">{result.rowCount.toLocaleString('en-IN')} rows detected</p>
+            </div>
+            <Button variant="ghost" className="!py-1.5 !px-3 text-xs" onClick={() => inputRef.current?.click()}>
+              Replace
+            </Button>
           </div>
-          <Button variant="ghost" className="!py-1.5 !px-3 text-xs" onClick={() => inputRef.current?.click()}>
-            Replace
-          </Button>
+          {result.warnings && result.warnings.length > 0 && (
+            <div className="rounded-xl border border-warning/40 bg-warning-bg p-3 text-sm text-warning">
+              <p className="font-medium">Potential order ID issue detected</p>
+              <ul className="mt-1 list-disc pl-5 space-y-1">
+                {result.warnings.map((warning) => (
+                  <li key={warning}>{warning}</li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </Card>

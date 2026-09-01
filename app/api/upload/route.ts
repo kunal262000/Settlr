@@ -52,5 +52,6 @@ export async function POST(req: NextRequest) {
     rows: parsed.rows,
     detected,
     suggestedMapping,
+    warnings: parsed.warnings ?? [],
   });
 }

@@ -25,7 +25,7 @@ create table if not exists reconciliation_jobs (
   amount_requiring_review numeric(14,2) not null default 0,
 
   financial_summary jsonb not null default '{}'::jsonb,
-
+ 
   error_message text,
   created_at timestamptz not null default now(),
   completed_at timestamptz

@@ -13,6 +13,7 @@ export interface ParsedFile {
   rows: Record<string, unknown>[];
   columns: string[];
   rowCount: number;
+  warnings?: string[];
 }
 
 export interface FileParseError {
@@ -34,6 +35,37 @@ export function validateFile(fileName: string, sizeBytes: number): string | null
     return 'File is empty.';
   }
   return null;
+}
+
+function detectNumericOrderIdWarnings(rows: Record<string, unknown>[], columns: string[]): string[] {
+  const warnings: string[] = [];
+  const orderColumns = columns.filter((column) => /order/i.test(column));
+
+  for (const column of orderColumns) {
+    for (const row of rows) {
+      const raw = row[column];
+      if (raw === null || raw === undefined || raw === '') continue;
+      const candidate = String(raw).trim();
+      const digits = candidate.replace(/\D/g, '');
+      if (!/^\d+$/.test(digits)) continue;
+
+      if (digits.length >= 16) {
+        warnings.push(
+          `Order IDs like "${candidate}" are very large numeric values. Excel can lose precision or reformat them in scientific notation, which may cause false mismatches. Keep order IDs as text in the source file when possible.`
+        );
+        break;
+      }
+
+      if (digits.length >= 11) {
+        warnings.push(
+          `Order IDs in column "${column}" look numeric and may be reformatted by Excel into scientific notation. To avoid false mismatches, keep them as plain text.`
+        );
+        break;
+      }
+    }
+  }
+
+  return [...new Set(warnings)];
 }
 
 export async function parseFileBuffer(
@@ -63,7 +95,7 @@ export async function parseFileBuffer(
         return { error: 'No sheets found in the uploaded file.' };
       }
       const sheet = workbook.Sheets[sheetName];
-      rows = XLSX.utils.sheet_to_json(sheet, { defval: null, raw: false });
+      rows = XLSX.utils.sheet_to_json(sheet, { defval: null, raw: true });
     }
 
     if (rows.length === 0) {
@@ -73,11 +105,6 @@ export async function parseFileBuffer(
       return { error: `File has ${rows.length.toLocaleString()} rows, which exceeds the ${MAX_ROWS.toLocaleString()} row limit.` };
     }
 
-    // Defense-in-depth against prototype pollution: strip any row/column
-    // using a dangerous key name outright, regardless of what the parsing
-    // library itself does with them. This doesn't depend on the xlsx
-    // library's own fix — it holds even if a future dependency
-    // regresses or a different file format sneaks a dangerous key through.
     const DANGEROUS_KEYS = new Set(['__proto__', 'constructor', 'prototype']);
     rows = rows.map((row) => {
       const clean: Record<string, unknown> = {};
@@ -88,7 +115,8 @@ export async function parseFileBuffer(
     });
 
     const columns = Object.keys(rows[0]).filter((c) => !DANGEROUS_KEYS.has(c));
-    return { fileName, rows, columns, rowCount: rows.length };
+    const warnings = detectNumericOrderIdWarnings(rows, columns);
+    return { fileName, rows, columns, rowCount: rows.length, warnings: warnings.length ? warnings : undefined };
   } catch (err) {
     return { error: `File could not be parsed. It may be corrupted or in an unexpected format. (${(err as Error).message})` };
   }
