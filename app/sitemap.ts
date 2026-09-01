@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { BLOG_POSTS } from '@/lib/blog-data';
 
-const SITE_URL = 'https://settlr.app';
+const SITE_URL = 'https://www.settlr.cyou';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [

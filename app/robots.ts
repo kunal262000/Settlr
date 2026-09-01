@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/dashboard', '/api'],
       },
     ],
-    sitemap: 'https://settlr.app/sitemap.xml',
+    sitemap: 'https://www.settlr.cyou/sitemap.xml',
+    host: 'https://www.settlr.cyou',
   };
 }

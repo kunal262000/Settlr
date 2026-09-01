@@ -1,13 +1,16 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button, Card } from '@/components/ui';
+import { StructuredData } from '@/components/structured-data';
 import { PLANS, formatPlanPrice } from '@/lib/pricing';
 import { supabaseServerComponent } from '@/lib/supabase-server';
 import SignOutButton from '@/app/dashboard/sign-out-button';
 
-export const metadata = {
-  title: 'Pricing — Settlr',
+export const metadata: Metadata = {
+  title: 'Pricing for marketplace reconciliation software',
   description:
-    'Simple, affordable pricing for Settlr — reconcile Amazon, Flipkart, and Meesho settlements without breaking the bank.',
+    'Simple pricing for Settlr, the marketplace reconciliation platform for Amazon, Flipkart, and Meesho sellers to catch missing settlements and payout mismatches.',
+  alternates: { canonical: '/pricing' },
 };
 
 export default async function PricingPage() {
@@ -18,8 +21,30 @@ export default async function PricingPage() {
 
   const isLoggedIn = !!user;
 
+  const pricingSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: 'Settlr',
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web',
+    description:
+      'Settlr helps Indian ecommerce sellers reconcile Amazon, Flipkart, and Meesho settlements with sales records to catch missing payouts, fee mismatches, and return discrepancies.',
+    offers: PLANS.map((plan) => ({
+      '@type': 'Offer',
+      name: plan.name,
+      price: plan.priceINR,
+      priceCurrency: 'INR',
+      availability: 'https://schema.org/InStock',
+      description: plan.features.join(', '),
+    })),
+    category: 'Marketplace reconciliation software',
+    url: 'https://www.settlr.cyou/pricing',
+  };
+
   return (
-    <div className="min-h-screen">
+    <>
+      <StructuredData data={pricingSchema} />
+      <div className="min-h-screen">
       <header className="border-b border-border bg-surface">
         <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -93,5 +118,6 @@ export default async function PricingPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

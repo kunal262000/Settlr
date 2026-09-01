@@ -30,7 +30,7 @@ export async function checkRateLimit(key: string, limit: number, windowSeconds: 
   const windowStart = new Date(existing.window_start);
   const elapsedSeconds = (now.getTime() - windowStart.getTime()) / 1000;
 
-  if (elapsedSeconds > windowSeconds) {
+  if (elapsedSeconds >= windowSeconds) {
     await supabase.from('rate_limits').update({ count: 1, window_start: now.toISOString() }).eq('key', key);
     return { allowed: true, remaining: limit - 1, retryAfterSeconds: 0 };
   }

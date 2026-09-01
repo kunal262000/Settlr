@@ -1,7 +1,14 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui';
 import { AnimatedAmount } from '@/components/animated-amount';
 import { supabaseServerComponent } from '@/lib/supabase-server';
+
+export const metadata: Metadata = {
+  title: 'Marketplace reconciliation for Meesho, Amazon and Flipkart sellers',
+  description:
+    'Settlr helps sellers reconcile marketplace settlements with sales data, detect mismatches, missing payouts, and returns across Amazon, Flipkart, and Meesho.',
+};
 
 export default async function LandingPage() {
   const supabase = supabaseServerComponent();

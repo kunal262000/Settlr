@@ -1,13 +1,16 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button, Card } from '@/components/ui';
+import { StructuredData } from '@/components/structured-data';
 import { BLOG_POSTS } from '@/lib/blog-data';
 import { supabaseServerComponent } from '@/lib/supabase-server';
 import SignOutButton from '@/app/dashboard/sign-out-button';
 
-export const metadata = {
-  title: 'Blog — Settlr',
+export const metadata: Metadata = {
+  title: 'Settlr blog: marketplace reconciliation guides',
   description:
     'Guides on Amazon, Flipkart, and Meesho settlement reconciliation, GST and TCS/TDS compliance, and marketplace fees tracking for Indian e-commerce sellers.',
+  alternates: { canonical: '/blog' },
 };
 
 export default async function BlogIndexPage() {
@@ -19,8 +22,35 @@ export default async function BlogIndexPage() {
   const isLoggedIn = !!user;
   const sorted = [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date));
 
+  const blogSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: 'Settlr Blog',
+    description:
+      'Practical guidance for Indian ecommerce sellers on marketplace reconciliation, payouts, fees, taxes, and settlement reporting.',
+    url: 'https://www.settlr.cyou/blog',
+    publisher: {
+      '@type': 'Organization',
+      name: 'Settlr',
+      url: 'https://www.settlr.cyou',
+    },
+    blogPost: sorted.map((post) => ({
+      '@type': 'BlogPosting',
+      headline: post.title,
+      description: post.description,
+      url: `https://www.settlr.cyou/blog/${post.slug}`,
+      datePublished: post.date,
+      author: {
+        '@type': 'Organization',
+        name: 'Settlr',
+      },
+    })),
+  };
+
   return (
-    <div className="min-h-screen">
+    <>
+      <StructuredData data={blogSchema} />
+      <div className="min-h-screen">
       <header className="border-b border-border bg-surface">
         <div className="mx-auto max-w-6xl px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
@@ -80,6 +110,7 @@ export default async function BlogIndexPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }
 
