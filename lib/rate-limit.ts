@@ -36,11 +36,12 @@ export async function checkRateLimit(key: string, limit: number, windowSeconds: 
   }
 
   if (existing.count >= limit) {
-    return { allowed: false, remaining: 0, retryAfterSeconds: Math.ceil(windowSeconds - elapsedSeconds) };
+    return { allowed: false, remaining: 0, retryAfterSeconds: Math.max(1, Math.ceil(windowSeconds - elapsedSeconds)) };
   }
 
-  await supabase.from('rate_limits').update({ count: existing.count + 1 }).eq('key', key);
-  return { allowed: true, remaining: limit - existing.count - 1, retryAfterSeconds: 0 };
+  const nextCount = existing.count + 1;
+  await supabase.from('rate_limits').update({ count: nextCount }).eq('key', key);
+  return { allowed: true, remaining: Math.max(0, limit - nextCount), retryAfterSeconds: 0 };
 }
 
 /** Returns a ready-to-send 429 response if the caller is over the limit, or null if they're clear. */

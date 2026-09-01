@@ -315,10 +315,19 @@ function toNumber(value: unknown): number | undefined {
 
 function toDateString(value: unknown): string | undefined {
   if (!value) return undefined;
-  if (value instanceof Date) return value.toISOString().slice(0, 10);
-  const d = new Date(String(value));
-  if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
-  return String(value);
+
+  if (value instanceof Date) {
+    const iso = value.toISOString();
+    return Number.isNaN(Date.parse(iso)) ? undefined : iso.slice(0, 10);
+  }
+
+  const raw = String(value).trim();
+  if (!raw) return undefined;
+
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return undefined;
+
+  return d.toISOString().slice(0, 10);
 }
 
 export function normalizeRows(

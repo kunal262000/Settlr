@@ -68,8 +68,12 @@ export default function PlanPicker({ plans, currentPlanId }: { plans: Plan[]; cu
         });
       }
 
+      if (!window.Cashfree) {
+        throw new Error('Cashfree SDK is unavailable. Please try again in a moment.');
+      }
+
       const mode = process.env.NEXT_PUBLIC_CASHFREE_ENV === 'production' ? 'production' : 'sandbox';
-      const cashfree = window.Cashfree!({ mode });
+      const cashfree = window.Cashfree({ mode });
       cashfree.checkout({ paymentSessionId: data.paymentSessionId, redirectTarget: '_self' });
     } catch (err) {
       setError((err as Error).message);

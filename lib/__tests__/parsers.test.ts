@@ -162,6 +162,12 @@ describe('normalizeRows', () => {
     expect(normalized[0].gross_amount).toBeUndefined();
     expect(normalized[0].net_amount).toBeUndefined();
   });
+
+  it('drops invalid date strings instead of returning raw malformed values', () => {
+    const rows = [{ OrderId: 'ORD1', Date: 'not-a-date' }];
+    const normalized = normalizeRows(rows, { order_id: 'OrderId', transaction_date: 'Date' }, 'seller');
+    expect(normalized[0].transaction_date).toBeUndefined();
+  });
 });
 
 describe('mappingFromDetected', () => {
