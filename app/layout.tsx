@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     template: '%s | Settlr',
   },
   description:
-    'Settlr helps Indian ecommerce sellers reconcile Meesho, Amazon, and Flipkart settlements with sales records to catch missing payouts, amount mismatches, duplicates, and return discrepancies.'[...]
+    'Settlr helps Indian ecommerce sellers reconcile Meesho, Amazon, and Flipkart settlements with sales records to catch missing payouts, amount mismatches, duplicates, and return discrepancies.',
   keywords: [
     'marketplace reconciliation',
     'Amazon settlement reconciliation',
@@ -104,6 +104,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             __html: JSON.stringify(organizationSchema),
           }}
         />
+      </head>
+      <body className="bg-bg text-ink font-sans antialiased">
+        {children}
         {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-K7EVPL791L"
@@ -121,8 +124,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             `,
           }}
         />
-      </head>
-      <body className="bg-bg text-ink font-sans antialiased">{children}</body>
+      </body>
     </html>
   );
 }
