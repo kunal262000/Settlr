@@ -45,8 +45,9 @@ create table if not exists reconciliation_records (
   order_id text not null,
   status text not null, -- see lib/reconciliation.ts ReconciliationStatus
 
-  seller_record jsonb,        -- normalized seller-side transaction(s)
-  marketplace_records jsonb,  -- normalized marketplace-side transaction(s), array
+  seller_record jsonb,         -- first normalized seller-side transaction, for quick display
+  seller_records jsonb,        -- all normalized seller-side transactions for this order, array
+  marketplace_records jsonb,   -- normalized marketplace-side transaction(s), array
 
   expected_amount numeric(14,2),
   transaction_date text,
@@ -54,6 +55,11 @@ create table if not exists reconciliation_records (
   difference numeric(14,2),
 
   reason text not null,
+
+  -- Set only for MISSING_SETTLEMENT / UNMATCHED_MARKETPLACE_RECORD when an
+  -- unmatched order id on the other side is a near-identical string — a
+  -- surfaced hint only, never used to auto-match.
+  possible_match_order_id text,
 
   created_at timestamptz not null default now()
 );
@@ -137,3 +143,12 @@ create policy "records_insert_own" on reconciliation_records
   for insert with check (auth.uid() = user_id);
 create policy "records_delete_own" on reconciliation_records
   for delete using (auth.uid() = user_id);
+
+-- ─────────────────────────────────────────────
+-- Migration: seller_records / possible_match_order_id
+-- Safe to re-run — for a fresh project the columns already exist from the
+-- create table above, so these are no-ops. For an existing project, run
+-- this whole file again (or just this block) to pick up the new columns.
+-- ─────────────────────────────────────────────
+alter table reconciliation_records add column if not exists seller_records jsonb;
+alter table reconciliation_records add column if not exists possible_match_order_id text;

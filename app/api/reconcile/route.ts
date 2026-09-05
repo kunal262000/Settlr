@@ -11,6 +11,16 @@ import { MARKETPLACES } from '@/lib/types';
 const MAX_ROWS_PER_REQUEST = 200_000; // matches the parser's own hard cap
 const VALID_MARKETPLACE_IDS = new Set(MARKETPLACES.map((m) => m.id));
 
+// Independent of plan limits: a hard technical ceiling on rows processed
+// synchronously within this one serverless request/response cycle. Growth's
+// "unlimited orders per file" is a promise about realistic settlement file
+// sizes, not a guarantee this route can churn through an arbitrarily large
+// file inside the function's time limit — this exists purely so an outlier
+// file fails fast with a clear message instead of silently timing out
+// mid-run. Revisit with a background job queue if real files start hitting
+// this regularly.
+const SYNCHRONOUS_PROCESSING_ROW_CEILING = 50_000;
+
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -75,8 +85,8 @@ export async function POST(req: NextRequest) {
   }
 
   const plan = getPlan(allowance.planId);
+  const rowCount = Math.max(body.settlementRows.length, body.salesRows.length);
   if (plan.maxOrdersPerFile !== null) {
-    const rowCount = Math.max(body.settlementRows.length, body.salesRows.length);
     if (rowCount > plan.maxOrdersPerFile) {
       return NextResponse.json(
         {
@@ -86,6 +96,13 @@ export async function POST(req: NextRequest) {
         { status: 402 }
       );
     }
+  } else if (rowCount > SYNCHRONOUS_PROCESSING_ROW_CEILING) {
+    return NextResponse.json(
+      {
+        error: `This file has ${rowCount.toLocaleString('en-IN')} rows, which is larger than we can reliably process in a single run right now (${SYNCHRONOUS_PROCESSING_ROW_CEILING.toLocaleString('en-IN')} row limit). Split it into smaller files and reconcile each separately, or contact support if you regularly work with files this large.`,
+      },
+      { status: 413 }
+    );
   }
 
   try {
@@ -126,12 +143,14 @@ export async function POST(req: NextRequest) {
       order_id: r.order_id,
       status: r.status,
       seller_record: r.seller_record ? stripRaw(r.seller_record) : null,
+      seller_records: r.seller_records.map(stripRaw),
       marketplace_records: r.marketplace_records.map(stripRaw),
       expected_amount: r.expected_amount ?? null,
       transaction_date: r.transaction_date ?? null,
       marketplace_amount: r.marketplace_amount ?? null,
       difference: r.difference ?? null,
       reason: r.reason,
+      possible_match_order_id: r.possible_match_order_id ?? null,
     }));
 
     // Insert in chunks to stay under request size limits on large files.

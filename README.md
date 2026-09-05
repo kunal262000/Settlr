@@ -145,7 +145,7 @@ functionality):
 
 ## Marketplace column aliases — now based on real report documentation
 
-The aliases in `lib/parsers.ts` (`MARKETPLACE_ALIASES`) were researched against
+The aliases in `lib/parsers.ts` (`MARKETPLACE_ADAPTERS`) were researched against
 each platform's actual settlement export format, not guessed:
 
 - **Amazon** — Seller Central's Flat File V2 settlement report (Payments →
@@ -170,8 +170,9 @@ This is a real improvement over guesswork, but marketplace exports do vary
 slightly by seller category, account region, and whether you're pulling
 from the dashboard vs. a third-party tool. The column mapping screen still
 lets you correct anything that doesn't auto-detect — if you find a
-consistent miss on a real file, add the header text to `MARKETPLACE_ALIASES`
-so future uploads catch it automatically.
+consistent miss on a real file, add the header text to that marketplace's
+`aliases` entry in `MARKETPLACE_ADAPTERS` so future uploads catch it
+automatically.
 
 ## Testing
 

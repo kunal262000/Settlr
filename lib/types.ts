@@ -53,12 +53,18 @@ export interface ReconciliationRecord {
   order_id: string;
   status: ReconciliationStatus;
   seller_record?: NormalizedTransaction;
+  seller_records: NormalizedTransaction[];
   marketplace_records: NormalizedTransaction[];
   expected_amount?: number;
   marketplace_amount?: number;
   difference?: number;
   reason: string;
   transaction_date?: string;
+  // Set only for MISSING_SETTLEMENT / UNMATCHED_MARKETPLACE_RECORD when an
+  // unmatched order id on the other side is a near-identical string (likely
+  // a formatting difference, not a genuinely missing record). Surfaced as a
+  // hint in the UI only — never used to auto-match.
+  possible_match_order_id?: string;
 }
 
 export interface FinancialSummary {

@@ -28,6 +28,7 @@ const records: ReconciliationRecord[] = [
   {
     order_id: 'A1',
     status: 'MATCHED',
+    seller_records: [],
     marketplace_records: [],
     expected_amount: 500,
     marketplace_amount: 500,
@@ -37,6 +38,7 @@ const records: ReconciliationRecord[] = [
   {
     order_id: 'A2',
     status: 'AMOUNT_MISMATCH',
+    seller_records: [],
     marketplace_records: [],
     expected_amount: 500,
     marketplace_amount: 400,

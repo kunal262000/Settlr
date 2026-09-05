@@ -47,12 +47,14 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
     order_id: r.order_id,
     status: r.status,
     seller_record: r.seller_record ?? undefined,
+    seller_records: r.seller_records ?? [],
     marketplace_records: r.marketplace_records ?? [],
     expected_amount: r.expected_amount ?? undefined,
     marketplace_amount: r.marketplace_amount ?? undefined,
     difference: r.difference ?? undefined,
     reason: r.reason,
     transaction_date: r.seller_record?.transaction_date,
+    possible_match_order_id: r.possible_match_order_id ?? undefined,
   }));
 
   const buffer = buildExportWorkbook(job as ReconciliationJob, mappedRecords);

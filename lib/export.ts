@@ -11,6 +11,7 @@ function recordsToRows(records: ReconciliationRecord[]) {
     Difference: r.difference ?? '',
     Status: STATUS_LABEL[r.status],
     Reason: r.reason,
+    'Possible Match': r.possible_match_order_id ?? '',
   }));
 }
 

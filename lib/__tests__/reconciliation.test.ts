@@ -49,9 +49,22 @@ describe('reconcile: status classification', () => {
     expect(records[0].status).toBe('UNMATCHED_MARKETPLACE_RECORD');
   });
 
-  it('classifies a repeated order id in the seller file as DUPLICATE_RECORD', () => {
+  it('classifies exact duplicate rows in the seller file as DUPLICATE_RECORD', () => {
     const { records } = reconcile([seller('A1'), seller('A1')], [marketplace('A1')]);
     expect(records[0].status).toBe('DUPLICATE_RECORD');
+  });
+
+  it('does not flag a legitimate multi-line seller order (different SKUs) as a duplicate', () => {
+    const { records } = reconcile(
+      [
+        seller('A1', { sku: 'SKU-1', gross_amount: 600 }),
+        seller('A1', { sku: 'SKU-2', gross_amount: 400 }),
+      ],
+      [marketplace('A1', { net_amount: 1000 })]
+    );
+    expect(records[0].status).toBe('MATCHED');
+    expect(records[0].expected_amount).toBe(1000);
+    expect(records[0].seller_records).toHaveLength(2);
   });
 
   it('classifies a return-flagged mismatch as RETURN_DISCREPANCY', () => {
@@ -160,6 +173,26 @@ describe('reconcile: financial summary', () => {
     // A2 mismatch contributes |500-450|=50; A3 missing settlement has no
     // difference figure (nothing to compare against), so only A2 counts.
     expect(summary.amount_requiring_review).toBe(50);
+  });
+});
+
+describe('reconcile: near-miss order id suggestions', () => {
+  it('suggests a possible match between a missing settlement and an unmatched marketplace record with a near-identical order id', () => {
+    const { records } = reconcile(
+      [seller('ORD-00123')], // no marketplace record -> MISSING_SETTLEMENT
+      [marketplace('ORD-123')] // no seller record -> UNMATCHED_MARKETPLACE_RECORD, but normalizes the same (leading zero stripped)
+    );
+    const missing = records.find((r) => r.order_id === 'ORD-00123');
+    const unmatched = records.find((r) => r.order_id === 'ORD-123');
+    expect(missing?.status).toBe('MISSING_SETTLEMENT');
+    expect(unmatched?.status).toBe('UNMATCHED_MARKETPLACE_RECORD');
+    expect(missing?.possible_match_order_id).toBe('ORD-123');
+    expect(unmatched?.possible_match_order_id).toBe('ORD-00123');
+  });
+
+  it('does not suggest a match between order ids that are genuinely different', () => {
+    const { records } = reconcile([seller('AAAA1')], [marketplace('ZZZZ9')]);
+    expect(records.every((r) => r.possible_match_order_id === undefined)).toBe(true);
   });
 });
 

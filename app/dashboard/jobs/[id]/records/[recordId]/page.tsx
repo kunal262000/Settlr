@@ -20,8 +20,20 @@ export default async function RecordDetailPage({ params }: { params: { id: strin
 
   if (!record) notFound();
 
-  const seller: NormalizedTransaction | null = record.seller_record;
+  const sellerRecords: NormalizedTransaction[] = record.seller_records ?? (record.seller_record ? [record.seller_record] : []);
   const marketplaceRecords: NormalizedTransaction[] = record.marketplace_records ?? [];
+
+  let possibleMatchRecordId: string | null = null;
+  if (record.possible_match_order_id) {
+    const { data: sibling } = await supabase
+      .from('reconciliation_records')
+      .select('id')
+      .eq('job_id', params.id)
+      .eq('user_id', user!.id)
+      .eq('order_id', record.possible_match_order_id)
+      .single();
+    possibleMatchRecordId = sibling?.id ?? null;
+  }
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -39,15 +51,22 @@ export default async function RecordDetailPage({ params }: { params: { id: strin
 
       <div className="mt-8 grid sm:grid-cols-2 gap-4">
         <Card className="p-6">
-          <h2 className="font-medium text-navy">Seller record</h2>
-          {seller ? (
-            <dl className="mt-4 space-y-2 text-sm">
-              <Row label="Gross Amount" value={formatINR(seller.gross_amount)} />
-              <Row label="Net Amount" value={formatINR(seller.net_amount)} />
-              <Row label="Order Date" value={seller.transaction_date ?? '—'} />
-              <Row label="SKU" value={seller.sku ?? '—'} />
-              <Row label="Product" value={seller.product_name ?? '—'} />
-            </dl>
+          <h2 className="font-medium text-navy">Seller record{sellerRecords.length > 1 ? 's' : ''}</h2>
+          {sellerRecords.length > 0 ? (
+            <div className="mt-4 space-y-5">
+              {sellerRecords.map((seller, i) => (
+                <dl key={i} className="space-y-2 text-sm pb-4 border-b border-border last:border-0 last:pb-0">
+                  {sellerRecords.length > 1 && (
+                    <p className="text-xs font-medium text-ink-muted">Line {i + 1}</p>
+                  )}
+                  <Row label="Gross Amount" value={formatINR(seller.gross_amount)} />
+                  <Row label="Net Amount" value={formatINR(seller.net_amount)} />
+                  <Row label="Order Date" value={seller.transaction_date ?? '—'} />
+                  <Row label="SKU" value={seller.sku ?? '—'} />
+                  <Row label="Product" value={seller.product_name ?? '—'} />
+                </dl>
+              ))}
+            </div>
           ) : (
             <p className="mt-4 text-sm text-ink-muted">No matching record found in your sales report.</p>
           )}
@@ -86,10 +105,37 @@ export default async function RecordDetailPage({ params }: { params: { id: strin
         <p className="mt-3 text-sm text-ink-muted leading-relaxed">{record.reason}</p>
       </Card>
 
+      {record.possible_match_order_id && (
+        <Card className="mt-4 p-6 border-amber-300 bg-amber-50">
+          <h2 className="font-medium text-navy">Possible match found</h2>
+          <p className="mt-2 text-sm text-ink-muted leading-relaxed">
+            Order ID <span className="font-mono">{record.possible_match_order_id}</span> is unmatched on the
+            other side and looks very similar to this order ID — likely a formatting difference (leading
+            zeros, extra characters) rather than a genuinely missing record. This is a suggestion only; it
+            has not been auto-matched.
+          </p>
+          {possibleMatchRecordId && (
+            <Link
+              href={`/dashboard/jobs/${params.id}/records/${possibleMatchRecordId}`}
+              className="mt-3 inline-block text-sm text-navy hover:underline"
+            >
+              View that record →
+            </Link>
+          )}
+        </Card>
+      )}
+
       {marketplaceRecords.length > 1 && (
         <p className="mt-4 text-xs text-ink-muted">
           This order has {marketplaceRecords.length} linked marketplace transactions. The settlement
-          amount above is the sum of all of them, compared against your single sales record.
+          amount above is the sum of all of them.
+        </p>
+      )}
+      {sellerRecords.length > 1 && (
+        <p className="mt-2 text-xs text-ink-muted">
+          This order has {sellerRecords.length} lines in your sales report. The expected amount above is
+          the sum of all of them, not a duplicate — a duplicate is only flagged when two or more lines
+          have identical SKU, transaction ID, and amount.
         </p>
       )}
     </div>

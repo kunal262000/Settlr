@@ -36,5 +36,10 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  // Excludes sitemap.xml/robots.txt/icon.svg too: these are fetched by
+  // crawlers (Googlebot etc.), never need a Supabase auth lookup, and
+  // that round-trip is pure added latency/failure surface on a request a
+  // crawler may abandon if it's slow (e.g. a Supabase free-tier project
+  // waking from being paused).
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|icon.svg).*)'],
 };
