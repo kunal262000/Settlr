@@ -204,6 +204,15 @@
   }
 }
 
+@keyframes ring-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(15, 118, 110, 0.34);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(15, 118, 110, 0);
+  }
+}
+
 .animate-step {
   animation: step-enter 0.5s ease-out forwards;
 }
@@ -280,4 +289,15 @@
 
 .animate-badge-pulse {
   animation: badge-pulse 2s ease-in-out 1.5s infinite;
+}
+
+.animate-ring-pulse {
+  animation: ring-pulse 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-ring-pulse {
+    animation: none;
+    box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+  }
 }

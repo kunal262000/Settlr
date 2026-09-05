@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from '@/components/ui';
 import { AnimatedAmount } from '@/components/animated-amount';
+import ProductTour from '@/components/product-tour';
 import { supabaseServerComponent } from '@/lib/supabase-server';
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default async function LandingPage() {
       <Nav isLoggedIn={!!user} userEmail={user?.email} />
       <Hero isLoggedIn={!!user} />
       <TrustStrip />
-      <HowItWorks />
+      <ProductTour />
       <WhatItCatches />
       <FinalCTA isLoggedIn={!!user} />
       <Footer isLoggedIn={!!user} />
@@ -243,38 +244,6 @@ function TrustStrip() {
           <div key={item} className="flex items-start gap-2">
             <span className="mt-1.5 h-1.5 w-1.5 rounded-full bg-teal shrink-0" />
             {item}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function HowItWorks() {
-  const steps = [
-    {
-      title: 'Upload',
-      body: 'Upload your marketplace settlement and sales/order reports.',
-    },
-    {
-      title: 'We Reconcile',
-      body: 'Settlr matches orders and analyzes settlements, deductions, and transaction differences.',
-    },
-    {
-      title: 'Find What Needs Attention',
-      body: 'See missing settlements, mismatches, returns, and unexplained differences in one place.',
-    },
-  ];
-
-  return (
-    <section id="how-it-works" className="mx-auto max-w-6xl px-6 py-24">
-      <h2 className="text-3xl font-semibold text-navy text-center">How it works</h2>
-      <div className="mt-12 grid md:grid-cols-3 gap-6">
-        {steps.map((step, i) => (
-          <div key={step.title} className="rounded-2xl border border-border bg-surface p-8">
-            <p className="text-sm font-mono text-teal mb-4">Step {i + 1}</p>
-            <h3 className="text-lg font-semibold text-navy">{step.title}</h3>
-            <p className="mt-2 text-sm text-ink-muted leading-relaxed">{step.body}</p>
           </div>
         ))}
       </div>
